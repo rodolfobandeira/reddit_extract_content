@@ -1,5 +1,6 @@
 #### Requirements without specific versions ####
 # os
+python-dotenv
 praw
 pandas
 # datetime

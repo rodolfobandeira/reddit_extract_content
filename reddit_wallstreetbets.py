@@ -4,6 +4,7 @@ import pandas as pd
 import datetime as dt
 from tqdm import tqdm
 import time
+from dotenv import load_dotenv
 
 
 def get_date(created):
@@ -11,6 +12,7 @@ def get_date(created):
 
 
 def reddit_connection():
+    load_dotenv()
     personal_use_script = os.environ["REDDIT_PERSONAL_USE_SCRIPT_14_CHARS"]
     client_secret = os.environ["REDDIT_SECRET_KEY_27_CHARS"]
     user_agent = os.environ["REDDIT_APP_NAME"]
@@ -26,7 +28,7 @@ def reddit_connection():
 
 
 def build_dataset(reddit, search_words='WallStreetBets', items_limit=1000):
-    
+
     # Collect reddit posts
     subreddit = reddit.subreddit(search_words)
     new_subreddit = subreddit.new(limit=items_limit)
@@ -36,7 +38,7 @@ def build_dataset(reddit, search_words='WallStreetBets', items_limit=1000):
                 "comms_num": [],
                 "created": [],
                 "body":[]}
-    
+
     print(f"retreive new reddit posts ...")
     for submission in tqdm(new_subreddit):
         topics_dict["title"].append(submission.title)
@@ -52,9 +54,9 @@ def build_dataset(reddit, search_words='WallStreetBets', items_limit=1000):
     topics_df['timestamp'] = topics_df['created'].apply(lambda x: get_date(x))
 
     return topics_df
-   
 
-def update_and_save_dataset(topics_df):   
+
+def update_and_save_dataset(topics_df):
     file_path = "reddit_wsb.csv"
     if os.path.exists(file_path):
         topics_old_df = pd.read_csv(file_path)
@@ -69,7 +71,7 @@ def update_and_save_dataset(topics_df):
         topics_df.to_csv(file_path, index=False)
 
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
 	reddit = reddit_connection()
 	topics_data_df = build_dataset(reddit)
 	update_and_save_dataset(topics_data_df)
