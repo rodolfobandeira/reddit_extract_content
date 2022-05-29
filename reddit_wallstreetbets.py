@@ -39,7 +39,9 @@ def build_dataset(reddit, search_words='WallStreetBets', items_limit=1000):
                 "created": [],
                 "body":[]}
 
-    print(f"retreive new reddit posts ...")
+    print(f"retrieve new reddit posts ...")
+    total_requests = 0
+    t = time.time() # Time in seconds
     for submission in tqdm(new_subreddit):
         topics_dict["title"].append(submission.title)
         topics_dict["score"].append(submission.score)
@@ -48,6 +50,13 @@ def build_dataset(reddit, search_words='WallStreetBets', items_limit=1000):
         topics_dict["comms_num"].append(submission.num_comments)
         topics_dict["created"].append(submission.created)
         topics_dict["body"].append(submission.selftext)
+
+        # Since Reddit API only allows 60 requests per minute, lets limit it here:
+        if (t >= time.time() + 55) or total_requests >= 55:
+            total_requests = 0
+            time.sleep(time.time() + t) # Sleep the diff to get be allowed by rate limit
+            t = time.time()
+
 
     topics_df = pd.DataFrame(topics_dict)
     print(f"new reddit posts retrieved: {len(topics_df)}")
