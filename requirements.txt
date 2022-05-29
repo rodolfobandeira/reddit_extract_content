@@ -1,0 +1,7 @@
+#### Requirements without specific versions ####
+# os
+praw
+pandas
+# datetime
+tqdm
+# time
